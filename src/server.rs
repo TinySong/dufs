@@ -4,8 +4,17 @@ use crate::utils::{
 };
 use crate::Args;
 use anyhow::{anyhow, Result};
+use clap::builder::OsStr;
+use std::io::Cursor;
+
+use unrar;
+use unrar::Archive as UnrarArchive;
 use walkdir::WalkDir;
 use xml::escape::escape_str_pcdata;
+use zip_extract;
+
+use flate2::read::GzDecoder;
+use tar::Archive;
 
 use async_zip::write::ZipFileWriter;
 use async_zip::{Compression, ZipDateTime, ZipEntryBuilder};
@@ -380,6 +389,31 @@ impl Server {
 
         io::copy(&mut body_reader, &mut file).await?;
 
+        let file_suffix = path.extension().unwrap();
+        if file_suffix == "tar" || file_suffix == "rar" || file_suffix == "zip" {
+            //let file_name = path.file_name().unwrap();
+            let tar_gz = std::fs::File::open(&path)?;
+            if file_suffix == "tar" {
+                let tar = GzDecoder::new(tar_gz);
+                let mut archive = Archive::new(tar);
+                let _state = archive.unpack(".")?;
+                // remove file after unzip
+                fs::remove_file(path).await?;
+            }
+
+            if file_suffix == "rar" {
+                let archive = UnrarArchive::new(path.display().to_string());
+                archive
+                    .extract_to("./".to_string())
+                    .unwrap()
+                    .process()
+                    .unwrap();
+                // remove file after unzip
+                fs::remove_file(path).await?;
+            }
+            //TODO support zip file to extract
+            if file_suffix == "zip" {}
+        }
         *res.status_mut() = StatusCode::CREATED;
         Ok(())
     }

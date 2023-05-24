@@ -1,6 +1,6 @@
 use anyhow::{bail, Context, Result};
 use clap::builder::PossibleValuesParser;
-use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
+use clap::{value_parser, Arg, ArgAction, ArgMatches, Command, Parser};
 use clap_complete::{generate, Generator, Shell};
 #[cfg(feature = "tls")]
 use rustls::{Certificate, PrivateKey};
@@ -14,6 +14,13 @@ use crate::log_http::{LogHttp, DEFAULT_LOG_FORMAT};
 #[cfg(feature = "tls")]
 use crate::tls::{load_certs, load_private_key};
 use crate::utils::encode_uri;
+
+// #[derive(Parser, Debug)]
+// struct Args {
+//     // name of the argments
+//     #[arg(short, long)]
+//     name: String,
+// }
 
 pub fn build_cli() -> Command {
     let app = Command::new(env!("CARGO_CRATE_NAME"))

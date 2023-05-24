@@ -44,6 +44,11 @@ content_inspector = "0.2"
 anyhow = "1.0"
 chardetng = "0.1"
 glob = "0.3.1"
+tar = "0.4.38"
+flate2 = "1.0.26"
+unrar = "0.4.4"
+zip = "0.6.6"
+zip-extract = "0.1.2"
 
 [features]
 default = ["tls"]

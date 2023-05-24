@@ -17,6 +17,21 @@ pub fn encode_uri(v: &str) -> String {
     parts.join("/")
 }
 
+pub fn get_extension_from_filename(filename: String) -> String {
+    //Change it to a canonical file path.
+    let path = Path::new(&filename)
+        .canonicalize()
+        .expect("Expecting an existing filename");
+
+    let filepath = path.to_str();
+    let name = filepath.unwrap().split('/');
+    let names: Vec<&str> = name.collect();
+    let extension = names.last().expect("File extension can not be read.");
+    let extens: Vec<&str> = extension.split(".").collect();
+
+    extens[1..(extens.len())].join(".").to_string()
+}
+
 pub fn decode_uri(v: &str) -> Option<Cow<str>> {
     percent_encoding::percent_decode(v.as_bytes())
         .decode_utf8()
